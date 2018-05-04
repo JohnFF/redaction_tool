@@ -26,7 +26,7 @@ class CRM_RedactionToolTest extends \PHPUnit_Framework_TestCase implements EndTo
   }
 
   public function testRedactPersonalDetails() {
-    $testContactId = $this->createTestContact();
+    $testContactId = self::createTestContact();
 
     CRM_RedactionTool::redactPersonalDetails($testContactId);
 
@@ -40,11 +40,11 @@ class CRM_RedactionToolTest extends \PHPUnit_Framework_TestCase implements EndTo
   }
 
   public function testRedactActivities() {
-    $testContactId = $this->createTestContact();
+    $testContactId = self::createTestContact();
 
     $activities = civicrm_api3('Activity', 'get', array('sequential' => 1, 'target_contact_id' => $testContactId));
 
-    $this->assertEquals(4, $activities['count']);
+    $this->assertEquals(5, $activities['count']);
     foreach($activities['values'] as $eachActivity) {
       $this->assertContains('Confidential', $eachActivity['subject']);
       $this->assertContains('Confidential', $eachActivity['details']);
@@ -55,7 +55,7 @@ class CRM_RedactionToolTest extends \PHPUnit_Framework_TestCase implements EndTo
 
     $redactedActivities = civicrm_api3('Activity', 'get', array('sequential' => 1, 'target_contact_id' => $testContactId));
 
-    $this->assertEquals(4, $redactedActivities['count']);
+    $this->assertEquals(5, $redactedActivities['count']);
 
     foreach($redactedActivities['values'] as $eachRedactedActivity) {
       if (in_array($eachRedactedActivity['activity_type_id'], array(2, 44, 34))) {
@@ -67,7 +67,7 @@ class CRM_RedactionToolTest extends \PHPUnit_Framework_TestCase implements EndTo
   }
 
   public function testDeleteActivities() {
-    $testContactId = $this->createTestContact();
+    $testContactId = self::createTestContact();
     $deletedActivityCount = $this->activityGetCountWrapper($testContactId, 'Guest Referral');
 
     $this->assertEquals(1, $deletedActivityCount);
@@ -90,7 +90,7 @@ class CRM_RedactionToolTest extends \PHPUnit_Framework_TestCase implements EndTo
     ));
   }
 
-  private function createTestContact() {
+  public static function createTestContact() {
     // Names and birth date.
     $testContact = civicrm_api3('Contact', 'create', array(
       'first_name' => 'Confidential first name',
@@ -118,7 +118,7 @@ class CRM_RedactionToolTest extends \PHPUnit_Framework_TestCase implements EndTo
     ));
 
     // Create some test activities.
-    $testActivityTypesToRedact = array('Phone call', 'SMS Delivery', 'Mass SMS');
+    $testActivityTypesToRedact = array('Phone call', 'SMS Delivery', 'Mass SMS', 'SMS');
 
     $testActivityTypesToDelete = array('Guest Referral');
 

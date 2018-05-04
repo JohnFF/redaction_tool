@@ -10,7 +10,7 @@ use CRM_Redactiontool_ExtensionUtil as E;
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC/API+Architecture+Standards
  */
 function _civicrm_api3_contact_Redact_spec(&$spec) {
-  $spec['id']['api.required'] = 1;
+  $spec['contact_id']['api.required'] = 1;
 }
 
 /**
@@ -23,5 +23,5 @@ function _civicrm_api3_contact_Redact_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_contact_Redact($params) {
-
+  CRM_RedactionTool::redact($params['contact_id']);
 }

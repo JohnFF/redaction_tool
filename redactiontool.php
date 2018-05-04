@@ -157,3 +157,16 @@ function redactiontool_civicrm_navigationMenu(&$menu) {
   ));
   _redactiontool_civix_navigationMenu($menu);
 } // */
+
+/**
+ * Implements hook_civicrm_searchTasks().
+ */
+function redactiontool_civicrm_searchTasks($objectType, &$tasks) {
+  if ($objectType == 'contact') {
+    $tasks[] = array(
+      'title'  => ts('Redact All Data'),
+      'class'  => 'CRM_Redactiontool_Form_Task_Redact',
+      'result' => TRUE,
+    );
+  }
+}

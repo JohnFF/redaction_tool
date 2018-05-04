@@ -6,4 +6,10 @@
     <title>Settings</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/redactiontool/redact</path>
+    <page_callback>CRM_Redactiontool_Form_Task_Redact</page_callback>
+    <title>Task_Redact</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

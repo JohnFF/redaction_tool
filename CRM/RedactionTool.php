@@ -8,7 +8,7 @@ class CRM_RedactionTool {
    */
   public static function redact($contactId) {
 
-    $activityTypesToRedact = array('Phone call', 'SMS Delivery', 'Outbound SMS',
+    $activityTypesToRedact = array('Phone call', 'SMS Delivery', 'SMS', // 'SMS' has the label 'Outbound SMS'.
       'Mass SMS');
 
     $activityTypesToDelete = array('Guest Referral');
@@ -26,12 +26,11 @@ class CRM_RedactionTool {
    * @param int $contactId
    */
   public static function redactPersonalDetails($contactId) {
+
     $contactTypes = civicrm_api3('Contact', 'getvalue', array(
       'return' => "contact_sub_type",
       'id' => $contactId,
     ));
-
-    unset($contactTypes['is_error']);
 
     $firstNameString = implode(" & ", $contactTypes) . " Id " . $contactId;
 
@@ -60,7 +59,7 @@ class CRM_RedactionTool {
    * @param int $contactId
    */
   public static function redactPhoneNumbers($contactId) {
-    $phoneNumbers = civicrm_api3('Phone', 'get', array());
+    $phoneNumbers = civicrm_api3('Phone', 'get', array('contact_id' => $contactId));
 
     foreach ($phoneNumbers['values'] as $eachPhoneNumber) {
       civicrm_api3('Phone', 'delete', array('id' => $eachPhoneNumber['id']));
