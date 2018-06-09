@@ -7,17 +7,19 @@ use CRM_Redactiontool_ExtensionUtil as E;
  *
  * @see https://wiki.civicrm.org/confluence/display/CRMDOC/QuickForm+Reference
  */
-class CRM_Redactiontool_Form_Task_Redact extends CRM_Core_Form {
+class CRM_Redactiontool_Form_Task_Redact extends CRM_Contact_Form_Task {
   public function buildQuickForm() {
 
-    // add form elements
-    $this->add(
-      'select', // field type
-      'favorite_color', // field name
-      'Favorite Color', // field label
-      $this->getColorOptions(), // list of options
-      TRUE // is required
-    );
+    $displayNames = array();
+
+    foreach($this->_contactIds as $eachContactId) {
+      $displayNames[] = civicrm_api3('Contact', 'getvalue', array('id' => $eachContactId, 'return' => 'display_name'));
+    }
+
+    // Display "for the following characters".
+    $displayNameString = implode(', ', $displayNames);
+
+    $this->addCheckBox('redaction_types', ts('Redaction Types'), $this->getRedactionTypes());
     $this->addButtons(array(
       array(
         'type' => 'submit',
@@ -32,26 +34,22 @@ class CRM_Redactiontool_Form_Task_Redact extends CRM_Core_Form {
   }
 
   public function postProcess() {
+
+    foreach($this->_contactIds as $eachContactId) {
+      civicrm_api3('Contact', 'Redact', array('contact_id' => $eachContactId));
+    }
+
     $values = $this->exportValues();
-    $options = $this->getColorOptions();
+
+    $options = $this->getRedactionTypes();
     CRM_Core_Session::setStatus(E::ts('You picked color "%1"', array(
       1 => $options[$values['favorite_color']],
     )));
     parent::postProcess();
   }
 
-  public function getColorOptions() {
-    $options = array(
-      '' => E::ts('- select -'),
-      '#f00' => E::ts('Red'),
-      '#0f0' => E::ts('Green'),
-      '#00f' => E::ts('Blue'),
-      '#f0f' => E::ts('Purple'),
-    );
-    foreach (array('1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e') as $f) {
-      $options["#{$f}{$f}{$f}"] = E::ts('Grey (%1)', array(1 => $f));
-    }
-    return $options;
+  public function getRedactionTypes() {
+    return array_flip(array('redact_name' => 'Permanently redact name', 'redact_dob' => 'Permanently redact date of birth', 'redact_activities' => 'Permanently redact activities'));
   }
 
   /**

@@ -166,7 +166,7 @@ function redactiontool_civicrm_searchTasks($objectType, &$tasks) {
     $tasks[] = array(
       'title'  => ts('Redact All Data'),
       'class'  => 'CRM_Redactiontool_Form_Task_Redact',
-      'result' => TRUE,
+      'url' => 'civicrm/redactiontool/redact',
     );
   }
 }
