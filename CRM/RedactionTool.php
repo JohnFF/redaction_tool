@@ -17,7 +17,8 @@ class CRM_RedactionTool {
     self::redactActivities($contactId, $activityTypesToRedact, $activityTypesToDelete);
     self::redactPhoneNumbers($contactId);
     self::redactAddresses($contactId);
-    
+    self::redactEmailAddresses($contactId);
+
     civicrm_api3('Activity', 'create', array('target_id' => $contactId, 'activity_type_id' => 'Redacted Data'));
   }
 
@@ -82,7 +83,7 @@ class CRM_RedactionTool {
         'options' => array('limit' => 0),
       ));
 
-      foreach ($activitiesToRedact['values'] as $eachActivityToRedact) {        
+      foreach ($activitiesToRedact['values'] as $eachActivityToRedact) {
         civicrm_api3('Activity', 'create', array(
           'id' => $eachActivityToRedact['id'],
           'subject' => '[REDACTED]',
@@ -100,11 +101,27 @@ class CRM_RedactionTool {
         'activity_type_id' => array('IN' => $activityTypesToDelete),
         'options' => array('limit' => 0),
       ));
-    
+
       foreach ($activitiesToDelete['values'] as $eachActivityToDelete) {
         civicrm_api3('Activity', 'delete', array('id' => $eachActivityToDelete['id']));
       }
     }
 
+  }
+
+  /**
+   *
+   * @param int $contactId
+   */
+  public static function redactEmailAddresses($contactId) {
+    $emailAddresses = civicrm_api3('Email', 'get', array(
+      'sequential' => 1,
+      'contact_id' => $contactId,
+      'options' => array('limit' => 0),
+    ));
+
+    foreach($emailAddresses['values'] as $eachEmailAddress) {
+      civicrm_api3('Email', 'delete', array('id' => $eachEmailAddress['id']));
+    }
   }
 }
