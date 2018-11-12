@@ -29,11 +29,11 @@ class CRM_RedactionTool {
   public static function redactPersonalDetails($contactId) {
 
     $contactTypes = civicrm_api3('Contact', 'getvalue', array(
-      'return' => "contact_sub_type",
+      'return' => 'contact_sub_type',
       'id' => $contactId,
     ));
 
-    $firstNameString = implode(" & ", $contactTypes) . " Id " . $contactId;
+    $firstNameString = implode(' & ', $contactTypes) . ' Id ' . $contactId;
 
     civicrm_api3('Contact', 'create', array(
       'id' => $contactId,
@@ -48,7 +48,10 @@ class CRM_RedactionTool {
    * @param int $contactId
    */
   public static function redactAddresses($contactId) {
-    $addresses = civicrm_api3('Address', 'get', array('contact_id' => $contactId));
+    $addresses = civicrm_api3('Address', 'get', array(
+        'contact_id' => $contactId,
+        'options' => array('limit' => 0),
+    ));
 
     foreach ($addresses['values'] as $eachAddress) {
       civicrm_api3('Address', 'delete', array('id' => $eachAddress['id']));
@@ -60,7 +63,10 @@ class CRM_RedactionTool {
    * @param int $contactId
    */
   public static function redactPhoneNumbers($contactId) {
-    $phoneNumbers = civicrm_api3('Phone', 'get', array('contact_id' => $contactId));
+    $phoneNumbers = civicrm_api3('Phone', 'get', array(
+        'contact_id' => $contactId,
+        'options' => array('limit' => 0),
+    ));
 
     foreach ($phoneNumbers['values'] as $eachPhoneNumber) {
       civicrm_api3('Phone', 'delete', array('id' => $eachPhoneNumber['id']));
